@@ -33,4 +33,6 @@ azure_core = "0.6"
 
 rand = "0.8"
 
-sea-orm = { version = "0.10.3", features = [ "sqlx-mysql","runtime-actix-rustls", "macros" ] }
+
+diesel = { version = "2.0", features = ["mysql", "chrono"] }
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
