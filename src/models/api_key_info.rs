@@ -29,6 +29,12 @@ pub struct APIKeyInfo {
     #[serde(rename = "secret_key_id")]
     pub secret_key_id: Option<String>,
 
+    #[serde(rename = "call_back_url")]
+    pub call_back_url: Option<String>,
+
+    #[serde(rename = "call_back_url_status")]
+    pub call_back_url_status : Option<String>,
+
     #[serde(rename = "created_dt")]
     pub created_dt: Option<String>,
 
