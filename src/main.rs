@@ -21,7 +21,8 @@ async fn index() -> impl Responder {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     //std::env::set_var("RUST_LOG", "debug");
-    env_logger::init();
+    //env_logger::init();
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     let instrumentation_key = std::env::var("INSTRUMENTATION_KEY").unwrap_or("".to_string());
     if !instrumentation_key.is_empty() {
