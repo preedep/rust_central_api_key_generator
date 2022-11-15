@@ -1,7 +1,7 @@
 mod models;
 mod apis;
 
-use std::fmt::format;
+
 use actix_web::{web, App, HttpServer, Responder};
 use actix_web::middleware::Logger;
 use actix_web_opentelemetry::RequestTracing;
@@ -47,6 +47,8 @@ async fn main() -> std::io::Result<()> {
         .build(manager);
 
     if let Ok(pool) = r_pool {
+        info!("{}","Web Server Starting....");
+
         HttpServer::new(move || {
             App::new()
                 .app_data(web::Data::new(pool.clone()))
