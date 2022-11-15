@@ -1,6 +1,7 @@
 mod models;
 mod apis;
 
+use std::fmt::format;
 use actix_web::{web, App, HttpServer, Responder};
 use actix_web::middleware::Logger;
 use actix_web_opentelemetry::RequestTracing;
@@ -35,10 +36,13 @@ async fn main() -> std::io::Result<()> {
             .install_simple();
     }
     //////
+    let user_name = std::env::var("DATABASE_USER_NAME").expect("DATABASE_USER_NAME Invalid");
+    let password = std::env::var("DATABASE_PASSWORD").expect("DATABASE_PASSWORD Invalid");
     let conn_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL Invalid");
-    debug!("{}",conn_spec);
+    let conn_str = format!("postgresql://{}:{}@{}",user_name,urlencoding::encode(password.as_str()),conn_spec);
+    debug!("{}",conn_str);
 
-    let manager = ConnectionManager::<PgConnection>::new(conn_spec);
+    let manager = ConnectionManager::<PgConnection>::new(conn_str);
     let r_pool  = r2d2::Pool::builder()
         .build(manager);
 
