@@ -5,8 +5,14 @@ mod apis;
 use actix_web::{web, App, HttpServer, Responder};
 use actix_web::middleware::Logger;
 use actix_web_opentelemetry::RequestTracing;
+use diesel::MysqlConnection;
+use diesel::r2d2::ConnectionManager;
 use log::info;
 use opentelemetry::global::shutdown_tracer_provider;
+
+
+type DbPool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
+
 
 async fn index() -> impl Responder {
     "Hello world!"
@@ -29,8 +35,17 @@ async fn main() -> std::io::Result<()> {
             .with_endpoint(instrumentation_endpoint.as_str()).unwrap()
             .install_simple();
     }
-    HttpServer::new(|| {
+    //////
+    let conn_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL Invalid");
+    let manager = ConnectionManager::<MysqlConnection>::new(conn_spec);
+    let pool : DbPool = r2d2::Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool.");
+
+
+    HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::new(pool.clone()))
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
             .wrap(RequestTracing::new())

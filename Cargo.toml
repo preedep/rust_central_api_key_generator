@@ -34,5 +34,6 @@ azure_core = "0.6"
 rand = "0.8"
 
 
-diesel = { version = "2.0", features = ["mysql", "chrono"] }
+diesel = { version = "2.0", features = ["mysql", "chrono","r2d2","numeric"] }
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+r2d2 = "0.8"

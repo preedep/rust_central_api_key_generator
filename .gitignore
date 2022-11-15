@@ -5,3 +5,4 @@ Cargo.lock
 .idea/modules.xml
 .idea/rust_central_api_key_generator.iml
 .idea/vcs.xml
+run.sh
