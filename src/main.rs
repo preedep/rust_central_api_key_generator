@@ -4,13 +4,13 @@ mod apis;
 use actix_web::{web, App, HttpServer, Responder};
 use actix_web::middleware::Logger;
 use actix_web_opentelemetry::RequestTracing;
-use diesel::MysqlConnection;
+use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
 use log::{debug, error, info};
 use opentelemetry::global::shutdown_tracer_provider;
 
 
-type DbPool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
+type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 async fn index() -> impl Responder {
     "Hello world!"
@@ -38,7 +38,7 @@ async fn main() -> std::io::Result<()> {
     let conn_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL Invalid");
     debug!("{}",conn_spec);
 
-    let manager = ConnectionManager::<MysqlConnection>::new(conn_spec);
+    let manager = ConnectionManager::<PgConnection>::new(conn_spec);
     let r_pool  = r2d2::Pool::builder()
         .build(manager);
 
