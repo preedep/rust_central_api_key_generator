@@ -6,3 +6,5 @@ Cargo.lock
 .idea/rust_central_api_key_generator.iml
 .idea/vcs.xml
 run.sh
+cert_db/DigiCertGlobalRootCA.crt
+cert_db/DigiCertGlobalRootCA.crt.pem

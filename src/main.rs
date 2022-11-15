@@ -1,7 +1,6 @@
 mod models;
 mod apis;
 
-
 use actix_web::{web, App, HttpServer, Responder};
 use actix_web::middleware::Logger;
 use actix_web_opentelemetry::RequestTracing;
@@ -12,7 +11,6 @@ use opentelemetry::global::shutdown_tracer_provider;
 
 
 type DbPool = r2d2::Pool<ConnectionManager<MysqlConnection>>;
-
 
 async fn index() -> impl Responder {
     "Hello world!"
