@@ -7,7 +7,7 @@ use actix_web::middleware::Logger;
 use actix_web_opentelemetry::RequestTracing;
 use diesel::MysqlConnection;
 use diesel::r2d2::ConnectionManager;
-use log::info;
+use log::{debug, error, info};
 use opentelemetry::global::shutdown_tracer_provider;
 
 
@@ -20,7 +20,7 @@ async fn index() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_web=info");
+    //std::env::set_var("RUST_LOG", "debug");
     env_logger::init();
 
     let instrumentation_key = std::env::var("INSTRUMENTATION_KEY").unwrap_or("".to_string());
@@ -37,28 +37,32 @@ async fn main() -> std::io::Result<()> {
     }
     //////
     let conn_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL Invalid");
+    debug!("{}",conn_spec);
+
     let manager = ConnectionManager::<MysqlConnection>::new(conn_spec);
-    let pool : DbPool = r2d2::Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool.");
+    let r_pool  = r2d2::Pool::builder()
+        .build(manager);
 
-
-    HttpServer::new(move || {
-        App::new()
-            .app_data(web::Data::new(pool.clone()))
-            .wrap(Logger::default())
-            .wrap(Logger::new("%a %{User-Agent}i"))
-            .wrap(RequestTracing::new())
-            .service(
-            // prefixes all resources and routes attached to it...
-            web::scope("/v1")
-                // ...so this handles requests for `GET /app/index.html`
-                .route("/index.html", web::get().to(index)),
-        )
-    })
-    .bind(("0.0.0.0", 8080))?
-    .run()
-    .await?;
+    if let Ok(pool) = r_pool {
+        HttpServer::new(move || {
+            App::new()
+                .app_data(web::Data::new(pool.clone()))
+                .wrap(Logger::default())
+                .wrap(Logger::new("%a %{User-Agent}i"))
+                .wrap(RequestTracing::new())
+                .service(
+                    // prefixes all resources and routes attached to it...
+                    web::scope("/v1")
+                        // ...so this handles requests for `GET /app/index.html`
+                        .route("/index.html", web::get().to(index)),
+                )
+        })
+            .bind(("0.0.0.0", 8080))?
+            .run()
+            .await?;
+    }else{
+        error!("{}",r_pool.err().unwrap().to_string());
+    }
     shutdown_tracer_provider();
     Ok(())
 }
