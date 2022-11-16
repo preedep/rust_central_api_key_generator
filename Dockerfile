@@ -67,6 +67,8 @@ WORKDIR /web_api_key
 ADD env.sh env.sh
 ADD static/ static/
 
+RUN chmod +x env.sh
+RUN ./env.sh
 
 USER 1000
 # default command
