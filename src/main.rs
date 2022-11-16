@@ -1,5 +1,6 @@
 mod models;
 mod apis;
+mod db;
 
 
 use actix_web::{web, App, Error,HttpServer, Responder};
@@ -10,13 +11,10 @@ use diesel::r2d2::ConnectionManager;
 use log::{debug, error, info};
 use opentelemetry::global::shutdown_tracer_provider;
 use actix_files as fs;
-use actix_files::NamedFile;
 
-type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
-
-pub async fn index() -> Result<NamedFile, Error> {
-    Ok(NamedFile::open("./static/index.html")?)
-}
+use handlebars::Handlebars;
+use crate::apis::apis::home;
+use crate::models::web_data_state::WebAppData;
 
 
 #[actix_web::main]
@@ -24,6 +22,16 @@ async fn main() -> std::io::Result<()> {
     //std::env::set_var("RUST_LOG", "debug");
     //env_logger::init();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
+
+
+    let mut hbars  = Handlebars::new();
+    hbars
+        .register_templates_directory(".html", "./static/")
+        .unwrap();
+
+
+    let hbars_ref = web::Data::new(hbars);
 
     let instrumentation_key = std::env::var("INSTRUMENTATION_KEY").unwrap_or("".to_string());
     if !instrumentation_key.is_empty() {
@@ -53,12 +61,12 @@ async fn main() -> std::io::Result<()> {
 
         HttpServer::new(move || {
             App::new()
-                .app_data(web::Data::new(pool.clone()))
+                .app_data(hbars_ref.clone())
                 .wrap(Logger::default())
                 .wrap(Logger::new("%a %{User-Agent}i"))
                 .wrap(RequestTracing::new())
-                .route("/", web::get().to(index))
-
+                .service(fs::Files::new("/", "./static").prefer_utf8(true))
+                .route("/", web::get().to(home))
         })
             .bind(("0.0.0.0", 8080))?
             .run()

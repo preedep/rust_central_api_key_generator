@@ -1,5 +1,5 @@
-docker rmi -f apikey_service:latest
-docker build -t apikey_service .
+#docker rmi -f apikey_service:latest
+#docker build -t apikey_service .
 
 read -p "Press any key to continue..." -n1 -s
 
