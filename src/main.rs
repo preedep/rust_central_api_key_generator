@@ -2,20 +2,22 @@ mod models;
 mod apis;
 
 
-use actix_web::{web, App, HttpServer, Responder};
+use actix_web::{web, App, Error,HttpServer, Responder};
 use actix_web::middleware::Logger;
 use actix_web_opentelemetry::RequestTracing;
 use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
 use log::{debug, error, info};
 use opentelemetry::global::shutdown_tracer_provider;
-
+use actix_files as fs;
+use actix_files::NamedFile;
 
 type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
-async fn index() -> impl Responder {
-    "Hello world!"
+pub async fn index() -> Result<NamedFile, Error> {
+    Ok(NamedFile::open("./static/index.html")?)
 }
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -55,12 +57,8 @@ async fn main() -> std::io::Result<()> {
                 .wrap(Logger::default())
                 .wrap(Logger::new("%a %{User-Agent}i"))
                 .wrap(RequestTracing::new())
-                .service(
-                    // prefixes all resources and routes attached to it...
-                    web::scope("/v1")
-                        // ...so this handles requests for `GET /app/index.html`
-                        .route("/index.html", web::get().to(index)),
-                )
+                .route("/", web::get().to(index))
+
         })
             .bind(("0.0.0.0", 8080))?
             .run()

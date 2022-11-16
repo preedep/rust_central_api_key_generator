@@ -67,6 +67,7 @@ WORKDIR /web_api_key
 ADD env.sh env.sh
 ADD static/ static/
 
+
 USER 1000
 # default command
 CMD ["/web_api_key/web_api_key.linux"]
