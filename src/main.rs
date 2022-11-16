@@ -13,8 +13,7 @@ use opentelemetry::global::shutdown_tracer_provider;
 use actix_files as fs;
 
 use handlebars::Handlebars;
-use crate::apis::apis::home;
-use crate::models::web_data_state::WebAppData;
+use crate::apis::page_home::home;
 
 
 #[actix_web::main]
@@ -23,14 +22,10 @@ async fn main() -> std::io::Result<()> {
     //env_logger::init();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
-
-
     let mut hbars  = Handlebars::new();
     hbars
         .register_templates_directory(".html", "./static/")
         .unwrap();
-
-
     let hbars_ref = web::Data::new(hbars);
 
     let instrumentation_key = std::env::var("INSTRUMENTATION_KEY").unwrap_or("".to_string());
@@ -62,10 +57,11 @@ async fn main() -> std::io::Result<()> {
         HttpServer::new(move || {
             App::new()
                 .app_data(hbars_ref.clone())
+                .app_data(web::Data::new(pool.clone()))
                 .wrap(Logger::default())
                 .wrap(Logger::new("%a %{User-Agent}i"))
                 .wrap(RequestTracing::new())
-                .service(fs::Files::new("/", "./static").prefer_utf8(true))
+                .service(fs::Files::new("/static", "static").prefer_utf8(true))
                 .route("/", web::get().to(home))
         })
             .bind(("0.0.0.0", 8080))?
