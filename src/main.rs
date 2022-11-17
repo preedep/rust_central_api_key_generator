@@ -1,5 +1,5 @@
 mod models;
-mod apis;
+mod webs;
 mod db;
 
 
@@ -13,8 +13,7 @@ use opentelemetry::global::shutdown_tracer_provider;
 use actix_files as fs;
 
 use handlebars::Handlebars;
-use crate::apis::page_home::home;
-use crate::apis::page_login::{login_handler};
+use crate::webs::page_handlers::{home_handler, login_handler};
 
 
 #[actix_web::main]
@@ -63,7 +62,7 @@ async fn main() -> std::io::Result<()> {
                 .wrap(Logger::new("%a %{User-Agent}i"))
                 .wrap(RequestTracing::new())
                 .service(fs::Files::new("/static", "static").prefer_utf8(true))
-                .route("/", web::get().to(home))
+                .route("/", web::get().to(home_handler))
                 .route("/login",web::post().to(login_handler))
 
         })
