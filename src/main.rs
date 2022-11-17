@@ -14,6 +14,7 @@ use actix_files as fs;
 
 use handlebars::Handlebars;
 use crate::apis::page_home::home;
+use crate::apis::page_login::{login_handler};
 
 
 #[actix_web::main]
@@ -63,6 +64,8 @@ async fn main() -> std::io::Result<()> {
                 .wrap(RequestTracing::new())
                 .service(fs::Files::new("/static", "static").prefer_utf8(true))
                 .route("/", web::get().to(home))
+                .route("/login",web::post().to(login_handler))
+
         })
             .bind(("0.0.0.0", 8080))?
             .run()
