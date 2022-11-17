@@ -4,6 +4,7 @@ use handlebars::Handlebars;
 use log::debug;
 use crate::db::db_service::DbPool;
 use serde::{Deserialize};
+use crate::webs::web_render::page_index_render;
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
@@ -25,7 +26,6 @@ pub async fn login_handler(hb: web::Data<Handlebars<'_>>, pool: web::Data<DbPool
     debug!("{}","post to login_form");
     debug!("User Name : {}",form.input_email_address);
 
-
-
-    HttpResponse::Ok().finish()
+    let body = page_index_render(hb,pool).unwrap();
+    HttpResponse::Ok().body(body)
 }
