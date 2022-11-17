@@ -13,7 +13,7 @@ use opentelemetry::global::shutdown_tracer_provider;
 use actix_files as fs;
 
 use handlebars::Handlebars;
-use crate::webs::page_handlers::{home_handler, login_handler};
+use crate::webs::page_handlers::{home_handler, do_login_handler, register_handler, login_handler, do_register_handler};
 
 
 #[actix_web::main]
@@ -63,8 +63,10 @@ async fn main() -> std::io::Result<()> {
                 .wrap(RequestTracing::new())
                 .service(fs::Files::new("/static", "static").prefer_utf8(true))
                 .route("/", web::get().to(home_handler))
-                .route("/login",web::post().to(login_handler))
-
+                .route("/register",web::get().to(register_handler))
+                .route("/login",web::get().to(login_handler))
+                .route("/do_login",web::post().to(do_login_handler))
+                .route("/do_register",web::post().to(do_register_handler))
         })
             .bind(("0.0.0.0", 8080))?
             .run()
