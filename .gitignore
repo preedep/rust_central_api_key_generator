@@ -10,3 +10,4 @@ cert_db/DigiCertGlobalRootCA.crt
 cert_db/DigiCertGlobalRootCA.crt.pem
 env.sh
 
+sqldialects.xml
