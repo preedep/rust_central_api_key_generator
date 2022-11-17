@@ -13,8 +13,6 @@ pub struct LoginRequest {
     #[serde(rename = "inputPassword")]
     pub input_password: String
 }
-
-
 #[derive(Deserialize)]
 pub struct RegisterRequest {
     #[serde(rename = "inputFirstName")]
@@ -28,8 +26,6 @@ pub struct RegisterRequest {
     #[serde(rename = "inputConfirmPassword")]
     pub input_confirm_password: String
 }
-
-
 
 pub async fn home_handler(hb: web::Data<Handlebars<'_>>,pool: web::Data<DbPool>) -> HttpResponse {
     debug!("{}","home");
@@ -64,7 +60,9 @@ pub async fn do_login_handler(hb: web::Data<Handlebars<'_>>, pool: web::Data<DbP
 
 pub async fn do_register_handler(hb: web::Data<Handlebars<'_>>, pool: web::Data<DbPool>,form: web::Form<RegisterRequest>) -> HttpResponse {
     debug!("{}","post to do_register_handler");
-
+    /*
+       Register
+    */
     let mut data :BTreeMap<String,String> = BTreeMap::new();
     data.insert("APP_COPY_RIGHT".to_string(),"API Key Generator 2023".to_string());
     let body = hb.render("login-basic", &data).unwrap();
