@@ -1,6 +1,10 @@
 mod models;
 mod webs;
 mod db;
+mod schema;
+
+#[macro_use]
+extern crate diesel;
 
 
 use actix_web::{web, App, Error,HttpServer, Responder};
